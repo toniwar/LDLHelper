@@ -17,7 +17,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.lifecycle.LifecycleOwner
@@ -26,8 +25,6 @@ import com.tonivar.ldlhelper.R
 import com.tonivar.ldlhelper.domain.models.Chapter
 import com.tonivar.ldlhelper.domain.models.Question
 import com.tonivar.ldlhelper.presentation.ActivityResultLauncherListener
-import com.tonivar.ldlhelper.utils.URIPathExtractor
-import java.io.File
 import java.lang.RuntimeException
 import java.util.ArrayList
 

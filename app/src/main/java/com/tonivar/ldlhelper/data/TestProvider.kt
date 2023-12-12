@@ -1,37 +1,57 @@
 package com.tonivar.ldlhelper.data
 
-import android.app.Activity
-import android.content.Intent
-import android.util.Log
-import androidx.core.net.toFile
-import com.tonivar.ldlhelper.presentation.MainActivity
+import com.tonivar.ldlhelper.data.models.TestAnswer
+import com.tonivar.ldlhelper.data.models.TestChapter
+import com.tonivar.ldlhelper.data.models.TestQuestion
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import java.io.File
-import java.lang.Exception
 
 class TestProvider {
 
-    fun getExcelFileFromStorage(activity: Activity): File? {
-        var file: File? = null
-        val mimeTypes = arrayOf("application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.setType( "*/*")
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        try {
-            activity.startActivity(Intent.createChooser(intent, "Выберите тест"))
+    fun getExcelFileFromStorage(file: File): Map<TestChapter, List<TestQuestion>> {
+        val wb = try {
+            WorkbookFactory.create(file.absoluteFile)
         } catch (e: Exception) {
-            Log.e("TestProvider", "Exception: $e: ${e.message}")
-            return null
+            throw RuntimeException(e)
         }
-        (activity as MainActivity).activityResultLauncher = {uri ->
-            if (uri == null) {
-               Log.d("TestProvider", "$uri")
+        var counter = 0
+        val testFileMap = HashMap<TestChapter, List<TestQuestion>>()
+        for (sheet in wb) {
+            val list = ArrayList<TestQuestion>()
+            var id = -1
+            for (row in sheet) {
+                val type = try {
+                    row.getCell(0).stringCellValue
+                } catch (e: IllegalStateException) {
+                    row.getCell(0).numericCellValue.toString()
+                } catch (e: NullPointerException) {
+                    ""
+                }
+                val text = try {
+                    row.getCell(0).stringCellValue
+                } catch (e: IllegalStateException) {
+                    row.getCell(0).numericCellValue.toString()
+                } catch (e: NullPointerException) {
+                    ""
+                }
+                if (type.equals("в", true)) {
+                    id++
+                    list.add(TestQuestion(id, text))
+
+                }
+                if (type.equals("о", true)) {
+                    list[id].answers.add(TestAnswer(text, false))
+                }
+                if (type.equals("п", true)) {
+                    list[id].answers.add(TestAnswer(text, true))
+                }
             }
-            uri?.let {
-                file = it.toFile()
-                Log.d("TestProvider", "${file!!.absoluteFile}")
+            if (list.isEmpty()) {
+                continue
             }
+            testFileMap[TestChapter(counter, sheet.sheetName)] = list.toList()
+            counter++
         }
-        return file
+        return testFileMap.toMap()
     }
 }

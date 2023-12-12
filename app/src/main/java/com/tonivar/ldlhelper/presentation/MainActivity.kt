@@ -3,7 +3,6 @@ package com.tonivar.ldlhelper.presentation
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -13,19 +12,21 @@ import com.tonivar.ldlhelper.presentation.fragments.LDLSearchFragment
 import com.tonivar.ldlhelper.presentation.fragments.LDLTestFragment
 import com.tonivar.ldlhelper.presentation.fragments.MenuFragment
 import com.tonivar.ldlhelper.presentation.fragments.StartFragment
+import java.io.File
 
-class MainActivity : AppCompatActivity(), FragmentListener {
+class MainActivity : AppCompatActivity(), FragmentListener, ActivityResultLauncherListener {
     private val dataKeys = mutableListOf<String>()
-    private lateinit var uri: ActivityResultLauncher<String>
-    lateinit var activityResultLauncher: (Uri?) -> Unit
-
+    private lateinit var launcher: ActivityResultLauncher<String>
+    private var uriCallback: ((Uri) -> Unit)? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        openFragment(StartFragment(), null)
-        uri = this.registerForActivityResult(ActivityResultContracts.GetContent()){
-            activityResultLauncher.invoke(it)
+        launcher = registerForActivityResult(ActivityResultContracts.GetContent()) {
+            it?.let {
+                uriCallback?.invoke(it)
+            }
         }
+        openFragment(StartFragment(), null)
     }
 
     override fun setAction(
@@ -52,5 +53,10 @@ class MainActivity : AppCompatActivity(), FragmentListener {
             .commit()
     }
 
-
+    override fun launch(fileType: String, callback: ((Uri)->Unit)?) {
+        launcher.launch(fileType)
+        uriCallback = {
+            callback?.invoke(it)
+        }
+    }
 }

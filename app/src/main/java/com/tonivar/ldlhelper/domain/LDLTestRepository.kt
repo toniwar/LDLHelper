@@ -1,12 +1,12 @@
 package com.tonivar.ldlhelper.domain
 
-import android.app.Activity
 import com.tonivar.ldlhelper.domain.models.Chapter
 import com.tonivar.ldlhelper.domain.models.Question
+import java.io.File
 
 interface LDLTestRepository {
 
-    fun getTest(activity: Activity)
+    fun getTest(file: File)
 
     fun getChapters(): List<Chapter>
 
