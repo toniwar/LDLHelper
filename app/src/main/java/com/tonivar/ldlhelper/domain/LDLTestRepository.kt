@@ -2,13 +2,18 @@ package com.tonivar.ldlhelper.domain
 
 import com.tonivar.ldlhelper.domain.models.Chapter
 import com.tonivar.ldlhelper.domain.models.Question
-import java.io.File
+import com.tonivar.ldlhelper.domain.models.Response
+import kotlinx.coroutines.flow.Flow
 
 interface LDLTestRepository {
 
-    fun getTest(file: File)
+    suspend fun getTest(source: List<String>): Flow<Response>
 
-    fun getChapters(): List<Chapter>
+    fun saveTestFileName(fileName: String)
+
+    fun getTestFileName(): Flow<String>
+
+    fun getChapters(): Flow<List<Chapter>>
 
     fun getQuestions(chapter: Chapter, range: IntRange) : List<Question>
 

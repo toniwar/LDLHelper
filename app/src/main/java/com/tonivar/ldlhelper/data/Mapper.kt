@@ -10,15 +10,19 @@ import com.tonivar.ldlhelper.domain.models.Question
 object Mapper {
 
     fun testChapterToChapter(tChapter : TestChapter) : Chapter {
-        return Chapter(tChapter.id, tChapter.title)
+        val questions = arrayListOf<Question>()
+        for (tQuestion in tChapter.questions) {
+            questions.add(testQuestionToQuestion(tQuestion))
+        }
+        return Chapter(tChapter.id,  questions, tChapter.title)
     }
 
-    fun testQuestionToQuestion(tQuestion : TestQuestion) : Question {
+    private fun testQuestionToQuestion(tQuestion : TestQuestion) : Question {
         val answers = arrayListOf<Answer>()
         for (tAnswer in tQuestion.answers) {
             answers.add(testAnswerToAnswer(tAnswer))
         }
-        return Question(tQuestion.id, tQuestion.question, answers)
+        return Question(tQuestion.id, answers, tQuestion.question)
     }
 
     private fun testAnswerToAnswer(tAnswer : TestAnswer) : Answer {

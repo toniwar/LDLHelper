@@ -3,5 +3,6 @@ package com.tonivar.ldlhelper.presentation
 import android.net.Uri
 
 interface ActivityResultLauncherListener {
-    fun launch(fileType : String, callback: ((Uri) -> Unit)?)
+    fun openFile(fileType : String, callback: ((Uri) -> Unit)?)
+    fun<T> requestPermissions(request: T)
 }
